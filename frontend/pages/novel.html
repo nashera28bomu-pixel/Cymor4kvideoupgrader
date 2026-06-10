@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Novel — Rumion Novel Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/main.css"/>
+  <style>
+    .novel-detail { display:grid; grid-template-columns:280px 1fr; gap:3rem; align-items:start; padding:3rem 0; }
+    .detail-cover { border-radius:var(--radius); overflow:hidden; aspect-ratio:2/3; box-shadow:var(--shadow-rose); background:linear-gradient(160deg,var(--crimson-dark),var(--rose)); display:flex;align-items:center;justify-content:center;font-size:4rem; }
+    .detail-cover img { width:100%;height:100%;object-fit:cover; }
+    .detail-title { font-family:var(--ff-display);font-size:clamp(1.8rem,3vw,2.8rem);font-weight:700;color:var(--text-dark);margin-bottom:0.5rem;line-height:1.15; }
+    .detail-author { font-size:1rem;color:var(--rose);font-weight:600;margin-bottom:1rem; }
+    .detail-badges { display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem; }
+    .detail-desc { font-size:1rem;line-height:1.8;color:var(--text-mid);margin-bottom:2rem; }
+    .detail-actions { display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:2.5rem; }
+    .chapters-list { margin-top:1rem; }
+    .chapter-item { display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1.25rem;border:1px solid var(--blush);border-radius:var(--radius-sm);margin-bottom:0.5rem;transition:all var(--transition);cursor:pointer;text-decoration:none;color:inherit; }
+    .chapter-item:hover { border-color:var(--rose);background:var(--blush-pale);transform:translateX(4px); }
+    .chapter-num { font-size:0.78rem;color:var(--rose);font-weight:700;margin-right:0.75rem; }
+    .chapter-title-text { font-family:var(--ff-display);font-size:0.95rem;font-weight:600;color:var(--text-dark); }
+    .chapter-arrow { color:var(--rose-light); }
+    @media(max-width:700px){ .novel-detail{grid-template-columns:1fr;} .detail-cover{max-width:220px;margin:0 auto;} }
+  </style>
+</head>
+<body>
+  <div class="petals-container" id="petals"></div>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/index.html" class="nav-logo"><span class="logo-icon">🌹</span><span class="logo-text">Rumion <em>Novel Hub</em></span></a>
+      <div class="nav-links">
+        <a href="/pages/discover.html">Discover</a>
+        <a href="/pages/classics.html">Classics</a>
+      </div>
+      <div class="nav-auth" id="nav-auth">
+        <a href="/pages/login.html" class="btn-ghost">Sign In</a>
+        <a href="/pages/register.html" class="btn-rose">Join Free</a>
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none">
+        <span id="nav-username" class="nav-username"></span>
+        <a href="/pages/bookmarks.html" class="icon-btn">🔖</a>
+        <button class="btn-ghost" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <div id="novel-detail">
+      <div style="text-align:center;padding:4rem;color:var(--text-soft);font-style:italic;font-family:var(--ff-display);">Loading story…</div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toasts"></div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><span class="logo-text">🌹 Rumion <em>Novel Hub</em></span></div>
+      <p class="footer-copy">© 2025 Rumion Novel Hub · Built with ❤️ by Cymor Tech Services</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { apiFetch, getUser, isLoggedIn, updateNavAuth, logout } from '/js/api.js';
+    window.logout = logout;
+
+    const id = new URLSearchParams(location.search).get('id');
+    if (!id) window.location.href = '/pages/discover.html';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateNavAuth();
+      spawnPetals();
+      loadNovel();
+    });
+
+    function spawnPetals() {
+      const c = document.getElementById('petals');
+      ['🌹','🌸'].forEach((s,i)=>{
+        const p=document.createElement('div');p.className='petal';p.textContent=s;
+        p.style.cssText=`left:${5+i*80}vw;animation-delay:${i*5}s;animation-duration:16s;font-size:16px;opacity:0.12;`;
+        c.appendChild(p);
+      });
+    }
+
+    let novel;
+
+    async function loadNovel() {
+      const container = document.getElementById('novel-detail');
+      try {
+        const data = await apiFetch(`/novels/${id}`);
+        novel = data.novel;
+        document.title = `${novel.title} — Rumion Novel Hub`;
+
+        // Check bookmark status
+        let isBookmarked = false;
+        let resumeChapterId = null;
+        if (isLoggedIn()) {
+          try {
+            const prog = await apiFetch(`/bookmarks/progress/${id}`);
+            resumeChapterId = prog.progress?.chapter_id;
+          } catch {}
+        }
+
+        const genres = novel.novel_genres?.map(ng => `<span class="genre-chip" style="padding:0.3rem 0.8rem;font-size:0.75rem;">${ng.genre?.name||''}</span>`).join('') || '';
+        const firstChapter = novel.chapters?.[0];
+        const resumeChapter = resumeChapterId
+          ? novel.chapters?.find(c => c.id === resumeChapterId)
+          : null;
+
+        container.innerHTML = `
+          <nav style="font-size:0.82rem;color:var(--text-soft);margin-bottom:1.5rem;">
+            <a href="/pages/discover.html" style="color:var(--rose);">Discover</a> › <span>${novel.title}</span>
+          </nav>
+
+          <div class="novel-detail">
+            <div>
+              <div class="detail-cover">
+                ${novel.cover_image ? `<img src="${novel.cover_image}" alt="${novel.title}"/>` : '📖'}
+              </div>
+              <div style="margin-top:1.25rem;display:flex;flex-direction:column;gap:0.6rem;">
+                ${isLoggedIn() ? `
+                  <button class="btn-outline" id="bookmark-btn" onclick="toggleBookmark()">🔖 Add to Library</button>
+                ` : `
+                  <a href="/pages/login.html" class="btn-ghost" style="text-align:center;display:block;">Sign in to bookmark</a>
+                `}
+                ${novel.source==='api' ? `<p style="font-size:0.75rem;color:var(--text-soft);text-align:center;margin-top:0.5rem;">📚 Project Gutenberg Classic</p>` : ''}
+              </div>
+            </div>
+
+            <div>
+              <h1 class="detail-title">${novel.title}</h1>
+              <p class="detail-author">by ${novel.author?.username || novel.gutenberg_author || 'Unknown Author'}</p>
+              <div class="detail-badges">${genres}</div>
+              <p class="detail-desc">${novel.description || ''}</p>
+
+              <div class="detail-actions">
+                ${firstChapter ? `
+                  <a href="/pages/reader.html?id=${resumeChapter?.id || firstChapter.id}" class="btn-primary">
+                    ${resumeChapter ? '▶ Continue Reading' : '📖 Start Reading'}
+                  </a>
+                ` : '<p style="color:var(--text-soft);font-style:italic;">No chapters yet.</p>'}
+              </div>
+
+              <h3 style="font-family:var(--ff-display);font-size:1.1rem;color:var(--crimson);margin-bottom:1rem;">
+                Chapters <span style="font-size:0.85rem;font-weight:400;color:var(--text-soft);">(${novel.chapters?.length || 0} total)</span>
+              </h3>
+
+              <div class="chapters-list">
+                ${(novel.chapters||[]).map(ch => `
+                  <a href="/pages/reader.html?id=${ch.id}" class="chapter-item">
+                    <div style="display:flex;align-items:center;">
+                      <span class="chapter-num">Ch.${ch.chapter_number}</span>
+                      <span class="chapter-title-text">${ch.title}</span>
+                    </div>
+                    <span class="chapter-arrow">›</span>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      } catch(err) {
+        container.innerHTML = `<p class="empty-msg">Could not load this story. <a href="/pages/discover.html" style="color:var(--rose)">Browse more →</a></p>`;
+      }
+    }
+
+    window.toggleBookmark = async () => {
+      if (!isLoggedIn()) { window.location.href = `/pages/login.html?redirect=${encodeURIComponent(location.href)}`; return; }
+      const btn = document.getElementById('bookmark-btn');
+      try {
+        await apiFetch(`/bookmarks/${id}`, { method: 'POST' });
+        btn.textContent = '✅ In Library';
+        btn.style.background = 'var(--blush)';
+        showToast('Added to your library! 🌹', 'success');
+      } catch(err) {
+        if (err.message.includes('Already')) { showToast('Already in your library!', 'success'); return; }
+        showToast(err.message, 'error');
+      }
+    };
+
+    function showToast(msg, type='') {
+      const c = document.getElementById('toasts');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+  </script>
+</body>
+</html>

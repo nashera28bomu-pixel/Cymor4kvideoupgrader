@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reading — Rumion Novel Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/main.css"/>
+  <style>
+    body { background: #1A0A0E; color: #F2E0C8; }
+    .reader-topbar { position:sticky;top:0;z-index:50;background:rgba(26,10,14,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(139,10,26,0.3);padding:0.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem; }
+    .reader-topbar .back-link { color:var(--rose-light);font-size:0.88rem;display:flex;align-items:center;gap:0.4rem;transition:color var(--transition); }
+    .reader-topbar .back-link:hover { color:var(--white); }
+    .reader-chapter-label { font-family:var(--ff-display);font-size:0.9rem;color:rgba(242,224,200,0.7);text-align:center;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .reading-bar { position:fixed;top:56px;left:0;height:3px;background:linear-gradient(90deg,var(--crimson),var(--rose));z-index:60;transition:width 0.1s; }
+    .reader-body { max-width:680px;margin:0 auto;padding:3rem 2rem 8rem; }
+    .reader-chapter-title { font-family:var(--ff-display);font-size:2rem;font-weight:700;color:var(--rose-light);margin-bottom:0.5rem; }
+    .reader-novel-name { font-size:0.88rem;color:rgba(242,224,200,0.5);margin-bottom:3rem;font-style:italic; }
+    .reader-text { font-family:var(--ff-display);font-size:1.15rem;line-height:2.1;color:#EDD8C8;letter-spacing:0.015em; }
+    .reader-text p { margin-bottom:1.8rem; }
+    .reader-controls { position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(26,10,14,0.97);border-top:1px solid rgba(139,10,26,0.3);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem; }
+    .ctrl-btn { padding:0.6rem 1.4rem;border-radius:50px;font-weight:700;font-size:0.88rem;border:1.5px solid rgba(139,10,26,0.4);color:var(--rose-light);background:transparent;cursor:pointer;transition:all var(--transition); }
+    .ctrl-btn:hover:not(:disabled) { background:var(--crimson);color:var(--white);border-color:var(--crimson); }
+    .ctrl-btn:disabled { opacity:0.3;cursor:not-allowed; }
+    .ctrl-btn.primary { background:var(--crimson);color:var(--white);border-color:var(--crimson); }
+    .font-toggle { display:flex;align-items:center;gap:0.5rem; }
+    .font-btn { background:none;border:1px solid rgba(139,10,26,0.4);color:var(--rose-light);border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer;font-size:0.82rem;transition:all var(--transition); }
+    .font-btn:hover { background:rgba(139,10,26,0.3); }
+    @media(max-width:600px){ .reader-text{font-size:1rem;line-height:1.9;} .reader-body{padding:2rem 1.25rem 7rem;} }
+  </style>
+</head>
+<body>
+  <div class="reading-bar" id="reading-bar" style="width:0%"></div>
+
+  <!-- Top bar -->
+  <div class="reader-topbar">
+    <a class="back-link" id="back-link" href="/pages/discover.html">← Back</a>
+    <span class="reader-chapter-label" id="chapter-label">Loading…</span>
+    <div class="font-toggle">
+      <button class="font-btn" onclick="changeFontSize(-1)">A−</button>
+      <button class="font-btn" onclick="changeFontSize(1)">A+</button>
+    </div>
+  </div>
+
+  <!-- Chapter content -->
+  <div class="reader-body">
+    <p class="reader-novel-name" id="novel-name"></p>
+    <h1 class="reader-chapter-title" id="chapter-title">Loading…</h1>
+    <div class="reader-text" id="reader-text">
+      <p style="color:rgba(242,224,200,0.4);font-style:italic;">Fetching your story… 🌹</p>
+    </div>
+  </div>
+
+  <!-- Bottom controls -->
+  <div class="reader-controls">
+    <button class="ctrl-btn" id="prev-btn" disabled onclick="navigate('prev')">← Previous</button>
+    <span id="chapter-num-label" style="font-size:0.82rem;color:rgba(242,224,200,0.5);"></span>
+    <button class="ctrl-btn primary" id="next-btn" disabled onclick="navigate('next')">Next →</button>
+  </div>
+
+  <script type="module">
+    import { apiFetch, isLoggedIn, getUser } from '/js/api.js';
+
+    const chapterId = new URLSearchParams(location.search).get('id');
+    if (!chapterId) window.location.href = '/pages/discover.html';
+
+    let chapter = null;
+    let fontSize = parseInt(localStorage.getItem('rumion_fontsize') || '18');
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      applyFontSize();
+      await loadChapter();
+      setupScrollProgress();
+    });
+
+    async function loadChapter() {
+      try {
+        const data = await apiFetch(`/chapters/${chapterId}`);
+        chapter = data.chapter;
+
+        document.title = `${chapter.title} — ${chapter.novel?.title} | Rumion`;
+        document.getElementById('chapter-label').textContent = `${chapter.novel?.title} · ${chapter.title}`;
+        document.getElementById('novel-name').textContent = chapter.novel?.title || '';
+        document.getElementById('chapter-title').textContent = chapter.title;
+        document.getElementById('back-link').href = `/pages/novel.html?id=${chapter.novel_id}`;
+
+        // Render content — split into paragraphs
+        const paragraphs = (chapter.content || '')
+          .split(/\n{2,}/)
+          .filter(p => p.trim())
+          .map(p => `<p>${p.trim().replace(/\n/g,' ')}</p>`)
+          .join('');
+        document.getElementById('reader-text').innerHTML = paragraphs || '<p><em>No content yet.</em></p>';
+
+        // Navigation buttons
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        if (chapter.prev_chapter) prevBtn.disabled = false;
+        if (chapter.next_chapter) nextBtn.disabled = false;
+
+        const numLabel = document.getElementById('chapter-num-label');
+        numLabel.textContent = `Ch. ${chapter.chapter_number}`;
+
+        // Save reading progress
+        if (isLoggedIn()) {
+          try {
+            await apiFetch('/bookmarks/progress/save', {
+              method: 'POST',
+              body: JSON.stringify({ novel_id: chapter.novel_id, chapter_id: chapter.id, scroll_position: 0 }),
+            });
+          } catch {}
+        }
+
+        // Restore scroll position from localStorage
+        const savedScroll = localStorage.getItem(`scroll_${chapterId}`);
+        if (savedScroll) setTimeout(() => window.scrollTo(0, parseInt(savedScroll)), 200);
+
+      } catch(err) {
+        document.getElementById('reader-text').innerHTML = `<p style="color:var(--rose-light)">Error: ${err.message}</p>`;
+      }
+    }
+
+    function setupScrollProgress() {
+      const bar = document.getElementById('reading-bar');
+      let saveTimer;
+
+      window.addEventListener('scroll', () => {
+        const total = document.body.scrollHeight - window.innerHeight;
+        const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+        bar.style.width = pct + '%';
+
+        // Save scroll pos debounced
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          localStorage.setItem(`scroll_${chapterId}`, window.scrollY);
+        }, 800);
+      });
+    }
+
+    window.navigate = (dir) => {
+      if (!chapter) return;
+      const target = dir === 'prev' ? chapter.prev_chapter : chapter.next_chapter;
+      if (target) {
+        localStorage.removeItem(`scroll_${chapterId}`);
+        window.scrollTo(0,0);
+        window.location.href = `/pages/reader.html?id=${target.id}`;
+      }
+    };
+
+    window.changeFontSize = (delta) => {
+      fontSize = Math.max(14, Math.min(26, fontSize + delta));
+      localStorage.setItem('rumion_fontsize', fontSize);
+      applyFontSize();
+    };
+
+    function applyFontSize() {
+      document.getElementById('reader-text').style.fontSize = fontSize + 'px';
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate('next');
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate('prev');
+    });
+  </script>
+</body>
+</html>

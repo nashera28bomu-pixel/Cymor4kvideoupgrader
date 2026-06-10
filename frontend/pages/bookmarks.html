@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Library — Rumion Novel Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/main.css"/>
+</head>
+<body>
+  <div class="petals-container" id="petals"></div>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/index.html" class="nav-logo"><span class="logo-icon">🌹</span><span class="logo-text">Rumion <em>Novel Hub</em></span></a>
+      <div class="nav-links"><a href="/pages/discover.html">Discover</a></div>
+      <div class="nav-user" id="nav-user" style="display:none">
+        <span id="nav-username" class="nav-username"></span>
+        <button class="btn-ghost" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="page-hero">
+      <p class="section-eyebrow">🔖 Your collection</p>
+      <h1>My Library</h1>
+      <p>All the stories you've saved, ready whenever you are.</p>
+    </div>
+    <div class="novels-grid" id="bookmarks-grid">
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><span class="logo-text">🌹 Rumion <em>Novel Hub</em></span></div>
+      <p class="footer-copy">© 2025 Rumion Novel Hub</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { apiFetch, isLoggedIn, updateNavAuth, logout } from '/js/api.js';
+    window.logout = logout;
+
+    if (!isLoggedIn()) window.location.href = '/pages/login.html?redirect=/pages/bookmarks.html';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateNavAuth();
+      spawnPetals();
+
+      const grid = document.getElementById('bookmarks-grid');
+      try {
+        const { bookmarks } = await apiFetch('/bookmarks');
+        if (!bookmarks.length) {
+          grid.innerHTML = '<p class="empty-msg">No bookmarks yet. Start reading and save your favourites! 🌹</p>';
+          return;
+        }
+        grid.innerHTML = bookmarks.map(b => {
+          const n = b.novel;
+          return `
+            <div class="novel-card" style="position:relative;">
+              <a href="/pages/novel.html?id=${n?.id}">
+                <div class="novel-cover">
+                  ${n?.cover_image ? `<img src="${n.cover_image}" alt="${n.title}" loading="lazy"/>` : '<div class="cover-placeholder"><span>📖</span></div>'}
+                  <div class="novel-overlay"><span class="read-btn">${b.last_chapter ? 'Continue' : 'Read Now'}</span></div>
+                </div>
+                <div class="novel-info">
+                  <h3 class="novel-title">${n?.title||'Unknown'}</h3>
+                  <p class="novel-author">by ${n?.author?.username||'Classic'}</p>
+                  ${b.last_chapter ? `<p style="font-size:0.75rem;color:var(--rose);margin-top:0.25rem;">📍 Last: ${b.last_chapter.title}</p>` : ''}
+                </div>
+              </a>
+              <button onclick="removeBookmark('${n?.id}', this)" style="position:absolute;top:0.5rem;right:0.5rem;background:rgba(92,6,18,0.7);border:none;color:white;border-radius:50%;width:26px;height:26px;font-size:0.75rem;cursor:pointer;" title="Remove">✕</button>
+            </div>
+          `;
+        }).join('');
+      } catch(err) {
+        grid.innerHTML = `<p class="empty-msg">${err.message}</p>`;
+      }
+    });
+
+    window.removeBookmark = async (id, btn) => {
+      btn.closest('.novel-card').style.opacity='0.4';
+      try {
+        await apiFetch(`/bookmarks/${id}`, { method:'DELETE' });
+        btn.closest('.novel-card').remove();
+      } catch { btn.closest('.novel-card').style.opacity='1'; }
+    };
+
+    function spawnPetals() {
+      const c=document.getElementById('petals');
+      ['🌹','🌸','🌷'].forEach((s,i)=>{
+        const p=document.createElement('div');p.className='petal';p.textContent=s;
+        p.style.cssText=`left:${15+i*35}vw;animation-delay:${i*4}s;animation-duration:${13+i}s;font-size:14px;opacity:0.15;`;
+        c.appendChild(p);
+      });
+    }
+  </script>
+</body>
+</html>

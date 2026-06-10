@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Rumion Novel Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+  <div class="petals-container" id="petals"></div>
+
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/index.html" class="nav-logo">
+        <span class="logo-icon">🌹</span>
+        <span class="logo-text">Rumion <em>Novel Hub</em></span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="page-wrap" style="display:flex;align-items:center;justify-content:center;min-height:85vh;">
+    <div class="form-card">
+      <h1 class="form-title">Welcome Back 🌹</h1>
+      <p class="form-subtitle">Sign in to continue your reading journey</p>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="your@email.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <p class="form-error" id="form-error"></p>
+
+      <button class="btn-primary form-submit" id="login-btn">Sign In</button>
+
+      <p class="form-alt">Don't have an account? <a href="/pages/register.html">Join Rumion</a></p>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toasts"></div>
+
+  <script type="module">
+    import { apiFetch, saveAuth, isLoggedIn } from '/js/api.js';
+
+    if (isLoggedIn()) window.location.href = '/index.html';
+
+    // Petals
+    const container = document.getElementById('petals');
+    ['🌸','🌹','❤️','🌷'].forEach((sym, i) => {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.textContent = sym;
+      p.style.cssText = `left:${15+i*22}vw;animation-delay:${i*2}s;animation-duration:${12+i*2}s;font-size:${14+i*3}px;opacity:0.2;`;
+      container.appendChild(p);
+    });
+
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('form-error');
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      errEl.classList.remove('show');
+
+      if (!email || !password) {
+        errEl.textContent = 'Please fill in all fields.';
+        errEl.classList.add('show'); return;
+      }
+
+      btn.textContent = 'Signing in…'; btn.disabled = true;
+      try {
+        const { user, token } = await apiFetch('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        saveAuth(user, token);
+        const redirect = new URLSearchParams(location.search).get('redirect') || '/index.html';
+        window.location.href = redirect;
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.add('show');
+        btn.textContent = 'Sign In'; btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener('click', login);
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  </script>
+</body>
+</html>
