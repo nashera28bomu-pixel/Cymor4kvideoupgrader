@@ -1,5 +1,5 @@
 // ─── CONFIG ───────────────────────────────────────────────
-const API_BASE = 'https://rumion-novel-hub.onrender.com'; // ← change after deploy
+const API_BASE = 'https://rumion-novel-hub.onrender.com/api'; // ← change after deploy
 
 // ─── HELPERS ──────────────────────────────────────────────
 export const getToken = () => localStorage.getItem('rumion_token');
