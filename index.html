@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rumion Novel Hub — Where Stories Bloom</title>
+  <meta name="description" content="Discover timeless classics and original stories crafted with love. Rumion Novel Hub — the reading platform for hopeless romantics." />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#8B0A1A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <!-- Floating petals background -->
+  <div class="petals-container" id="petals"></div>
+
+  <!-- ── NAVBAR ─────────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="/index.html" class="nav-logo">
+        <span class="logo-icon">🌹</span>
+        <span class="logo-text">Rumion <em>Novel Hub</em></span>
+      </a>
+
+      <div class="nav-links">
+        <a href="/pages/discover.html">Discover</a>
+        <a href="/pages/genres.html">Genres</a>
+        <a href="/pages/classics.html">Classics</a>
+        <a href="/pages/dashboard.html" class="author-only" style="display:none">My Stories</a>
+        <a href="/pages/admin.html" class="admin-only" style="display:none">Admin</a>
+      </div>
+
+      <div class="nav-auth" id="nav-auth">
+        <a href="/pages/login.html" class="btn-ghost">Sign In</a>
+        <a href="/pages/register.html" class="btn-rose">Join Free</a>
+      </div>
+
+      <div class="nav-user" id="nav-user" style="display:none">
+        <span class="nav-username" id="nav-username"></span>
+        <span class="role-badge" id="nav-role"></span>
+        <a href="/pages/bookmarks.html" class="icon-btn" title="My Bookmarks">🔖</a>
+        <button class="btn-ghost" onclick="logout()">Sign Out</button>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/pages/discover.html">Discover</a>
+      <a href="/pages/genres.html">Genres</a>
+      <a href="/pages/classics.html">Classics</a>
+      <a href="/pages/dashboard.html" class="author-only" style="display:none">My Stories</a>
+      <a href="/pages/admin.html" class="admin-only" style="display:none">Admin</a>
+      <hr />
+      <a href="/pages/login.html" id="mob-login">Sign In</a>
+      <a href="/pages/register.html" id="mob-register">Join Free</a>
+      <button onclick="logout()" id="mob-logout" style="display:none" class="btn-ghost">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ────────────────────────────────────────── -->
+  <header class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">
+        <span class="petal-icon">🌸</span> A world of stories, crafted with love
+      </p>
+      <h1 class="hero-title">
+        Where Every Page<br /><em>Tells a Love Story</em>
+      </h1>
+      <p class="hero-sub">
+        Dive into thousands of timeless classics and discover original novels by emerging authors.
+        From heartbreak to happily ever after — your next favourite story is waiting.
+      </p>
+      <div class="hero-cta">
+        <a href="/pages/discover.html" class="btn-primary">Start Reading</a>
+        <a href="/pages/register.html" class="btn-outline">Become an Author</a>
+      </div>
+      <div class="hero-stats" id="hero-stats">
+        <div class="stat"><span class="stat-num" id="stat-novels">—</span><span class="stat-label">Stories</span></div>
+        <div class="stat-divider">✦</div>
+        <div class="stat"><span class="stat-num" id="stat-chapters">—</span><span class="stat-label">Chapters</span></div>
+        <div class="stat-divider">✦</div>
+        <div class="stat"><span class="stat-num" id="stat-users">—</span><span class="stat-label">Readers</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="book-stack">
+        <div class="book book-1"><span>Pride &amp;<br/>Prejudice</span></div>
+        <div class="book book-2"><span>Jane<br/>Eyre</span></div>
+        <div class="book book-3"><span>Romeo &amp;<br/>Juliet</span></div>
+        <div class="book book-4"><span>Wuthering<br/>Heights</span></div>
+      </div>
+      <div class="rose-glow"></div>
+    </div>
+  </header>
+
+  <!-- ── FEATURED NOVELS ───────────────────────────── -->
+  <section class="section featured-section">
+    <div class="section-header">
+      <p class="section-eyebrow">Hand-picked for you</p>
+      <h2 class="section-title">Featured Stories</h2>
+    </div>
+    <div class="novels-grid" id="featured-grid">
+      <!-- Skeleton loaders -->
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+    </div>
+    <div class="section-footer">
+      <a href="/pages/discover.html" class="btn-outline">Browse All Stories →</a>
+    </div>
+  </section>
+
+  <!-- ── LATEST NOVELS ─────────────────────────────── -->
+  <section class="section latest-section">
+    <div class="section-header">
+      <p class="section-eyebrow">Fresh from the ink</p>
+      <h2 class="section-title">Latest Additions</h2>
+    </div>
+    <div class="novels-grid" id="latest-grid">
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+      <div class="novel-card skeleton"></div>
+    </div>
+  </section>
+
+  <!-- ── GENRES SHOWCASE ───────────────────────────── -->
+  <section class="section genres-section">
+    <div class="section-header">
+      <p class="section-eyebrow">Find your mood</p>
+      <h2 class="section-title">Browse by Genre</h2>
+    </div>
+    <div class="genres-grid" id="genres-grid">
+      <a href="/pages/discover.html?genre=romance" class="genre-chip">💕 Romance</a>
+      <a href="/pages/discover.html?genre=mystery" class="genre-chip">🔍 Mystery</a>
+      <a href="/pages/discover.html?genre=fantasy" class="genre-chip">✨ Fantasy</a>
+      <a href="/pages/discover.html?genre=drama" class="genre-chip">🎭 Drama</a>
+      <a href="/pages/discover.html?genre=historical" class="genre-chip">📜 Historical</a>
+      <a href="/pages/discover.html?genre=adventure" class="genre-chip">🗺️ Adventure</a>
+      <a href="/pages/discover.html?genre=thriller" class="genre-chip">😱 Thriller</a>
+      <a href="/pages/discover.html?genre=classics" class="genre-chip">🏛️ Classics</a>
+    </div>
+  </section>
+
+  <!-- ── AUTHOR CTA ─────────────────────────────────── -->
+  <section class="section cta-section">
+    <div class="cta-card">
+      <div class="cta-text">
+        <p class="section-eyebrow">Got a story to tell?</p>
+        <h2>Share Your Story<br /><em>with the World</em></h2>
+        <p>Join Rumion's growing community of writers. Upload your novel, chapter by chapter, and let readers fall in love with your words.</p>
+        <a href="/pages/register.html?role=author" class="btn-primary">Start Writing Today</a>
+      </div>
+      <div class="cta-visual">
+        <div class="quill-animation">
+          <div class="quill">🪶</div>
+          <div class="ink-lines">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">🌹 Rumion <em>Novel Hub</em></span>
+        <p>Where every story blooms.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/pages/discover.html">Discover</a>
+        <a href="/pages/classics.html">Classics</a>
+        <a href="/pages/register.html">Join</a>
+        <a href="/pages/login.html">Sign In</a>
+      </div>
+      <p class="footer-copy">© 2025 Rumion Novel Hub · Built with ❤️ by Cymor Tech Services</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { apiFetch, updateNavAuth, logout } from '/js/api.js';
+    window.logout = logout;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateNavAuth();
+      spawnPetals();
+      setupHamburger();
+      loadFeatured();
+      loadLatest();
+      loadStats();
+    });
+
+    // ── Petal animation
+    function spawnPetals() {
+      const container = document.getElementById('petals');
+      const petalSymbols = ['🌸', '🌹', '🌺', '❤️', '🌷', '✿'];
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        p.textContent = petalSymbols[Math.floor(Math.random() * petalSymbols.length)];
+        p.style.cssText = `
+          left: ${Math.random() * 100}vw;
+          animation-delay: ${Math.random() * 12}s;
+          animation-duration: ${10 + Math.random() * 10}s;
+          font-size: ${12 + Math.random() * 14}px;
+          opacity: ${0.15 + Math.random() * 0.25};
+        `;
+        container.appendChild(p);
+      }
+    }
+
+    // ── Hamburger
+    function setupHamburger() {
+      const btn = document.getElementById('hamburger');
+      const menu = document.getElementById('mobile-menu');
+      btn?.addEventListener('click', () => menu?.classList.toggle('open'));
+    }
+
+    // ── Load featured novels
+    async function loadFeatured() {
+      const grid = document.getElementById('featured-grid');
+      try {
+        const { novels } = await apiFetch('/novels/featured');
+        if (!novels.length) {
+          const { novels: fallback } = await apiFetch('/novels?limit=6');
+          renderNovels(grid, fallback.novels || fallback);
+        } else {
+          renderNovels(grid, novels);
+        }
+      } catch {
+        grid.innerHTML = '<p class="empty-msg">Could not load stories right now.</p>';
+      }
+    }
+
+    // ── Load latest
+    async function loadLatest() {
+      const grid = document.getElementById('latest-grid');
+      try {
+        const { novels } = await apiFetch('/novels?limit=4&page=1');
+        renderNovels(grid, novels);
+      } catch {
+        grid.innerHTML = '';
+      }
+    }
+
+    // ── Load stats
+    async function loadStats() {
+      try {
+        const { stats } = await apiFetch('/admin/stats');
+        animateCount('stat-novels', stats.total_novels);
+        animateCount('stat-chapters', stats.total_chapters);
+        animateCount('stat-users', stats.total_users);
+      } catch {
+        ['stat-novels','stat-chapters','stat-users'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '∞';
+        });
+      }
+    }
+
+    function animateCount(id, target) {
+      const el = document.getElementById(id);
+      if (!el || !target) return;
+      let count = 0;
+      const step = Math.ceil(target / 60);
+      const timer = setInterval(() => {
+        count = Math.min(count + step, target);
+        el.textContent = count.toLocaleString();
+        if (count >= target) clearInterval(timer);
+      }, 20);
+    }
+
+    // ── Render novel cards
+    function renderNovels(container, novels) {
+      if (!novels || !novels.length) {
+        container.innerHTML = '<p class="empty-msg">No stories yet. Be the first to write one! 🌹</p>';
+        return;
+      }
+      container.innerHTML = novels.map(novel => `
+        <a href="/pages/novel.html?id=${novel.id}" class="novel-card">
+          <div class="novel-cover">
+            ${novel.cover_image
+              ? `<img src="${novel.cover_image}" alt="${novel.title}" loading="lazy" />`
+              : `<div class="cover-placeholder"><span>📖</span></div>`
+            }
+            <div class="novel-overlay">
+              <span class="read-btn">Read Now</span>
+            </div>
+          </div>
+          <div class="novel-info">
+            <h3 class="novel-title">${novel.title}</h3>
+            <p class="novel-author">by ${novel.author?.username || novel.gutenberg_author || 'Unknown'}</p>
+            <p class="novel-desc">${(novel.description || '').slice(0, 90)}${novel.description?.length > 90 ? '…' : ''}</p>
+          </div>
+        </a>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
