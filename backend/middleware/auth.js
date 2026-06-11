@@ -12,7 +12,7 @@ export const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, username, email, role')
+      .select('id, username, email, role, can_write')
       .eq('id', decoded.id)
       .single();
 
@@ -24,9 +24,22 @@ export const authenticate = async (req, res, next) => {
   }
 };
 
+// FIX 4: 'member' can do anything 'author' can do (unified role)
 export const requireRole = (...roles) => (req, res, next) => {
-  if (!roles.includes(req.user?.role)) {
-    return res.status(403).json({ error: 'Access denied' });
+  const user = req.user;
+  if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+  // admin can do everything
+  if (user.role === 'admin') return next();
+
+  // writing routes: allow member + author + anyone with can_write=true
+  const writingRoles = ['author', 'member'];
+  const requestedWriting = roles.some(r => writingRoles.includes(r));
+  if (requestedWriting && (writingRoles.includes(user.role) || user.can_write)) {
+    return next();
   }
-  next();
+
+  if (roles.includes(user.role)) return next();
+
+  return res.status(403).json({ error: 'Access denied' });
 };
