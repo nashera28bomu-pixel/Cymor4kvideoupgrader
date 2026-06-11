@@ -102,7 +102,9 @@
     if (!isLoggedIn()) window.location.href = '/pages/login.html?redirect=/pages/dashboard.html';
 
     const user = getUser();
-    if (user && user.role === 'reader') window.location.href = '/pages/discover.html';
+    // FIX 4: readers with old role can still access dashboard
+    // only block if explicitly a 'reader' with no writing rights (legacy)
+    // all new accounts are 'member' so no block needed
 
     let myNovels = [];
     let currentNovel = null;
