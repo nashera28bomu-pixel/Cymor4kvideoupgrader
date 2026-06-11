@@ -14,8 +14,10 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'Username, email, and password are required' });
   }
 
-  const allowedRoles = ['reader', 'author'];
-  const userRole = allowedRoles.includes(role) ? role : 'reader';
+  // FIX 4: everyone gets 'member' role (can read + write)
+  // 'reader' legacy maps to member. 'author' intent = member with writing enabled.
+  const allowedRoles = ['reader', 'author', 'member'];
+  const userRole = 'member'; // all new users are members — can read & write
 
   try {
     const { data: existing } = await supabase
@@ -30,8 +32,8 @@ router.post('/register', async (req, res) => {
 
     const { data: user, error } = await supabase
       .from('users')
-      .insert({ username, email, password_hash, role: userRole })
-      .select('id, username, email, role')
+      .insert({ username, email, password_hash, role: userRole, can_write: true })
+      .select('id, username, email, role, can_write')
       .single();
 
     if (error) throw error;
@@ -65,7 +67,7 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({
-      user: { id: user.id, username: user.username, email: user.email, role: user.role },
+      user: { id: user.id, username: user.username, email: user.email, role: user.role, can_write: user.can_write ?? true },
       token,
     });
   } catch (err) {
