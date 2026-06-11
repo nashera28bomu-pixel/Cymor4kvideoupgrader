@@ -44,11 +44,12 @@ export function updateNavAuth() {
     if (nameEl) nameEl.textContent = user.username;
     const roleEl = document.getElementById('nav-role');
     if (roleEl) {
-      roleEl.textContent = user.role;
+      roleEl.textContent = user.role === 'admin' ? 'Admin' : '✍️';
       roleEl.className = `role-badge role-${user.role}`;
     }
-    // Show/hide role-specific links
-    if (user.role === 'author' || user.role === 'admin') {
+    // FIX 4: member/author/admin all get the writing dashboard link
+    const canWrite = user.role === 'member' || user.role === 'author' || user.role === 'admin';
+    if (canWrite) {
       document.querySelectorAll('.author-only').forEach(el => el.style.display = '');
     }
     if (user.role === 'admin') {
