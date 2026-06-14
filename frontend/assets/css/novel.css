@@ -1,0 +1,91 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b0000;
+  color: white;
+}
+
+/* NAV */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  background: #1a0000;
+  border-bottom: 1px solid #ff2b5c;
+}
+
+.logo {
+  color: #ff2b5c;
+  text-decoration: none;
+}
+
+.brand {
+  font-weight: bold;
+}
+
+/* MAIN */
+.novel-container {
+  padding: 20px;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* NOVEL HEADER */
+#novel-header {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.cover {
+  width: 200px;
+  border-radius: 10px;
+  border: 2px solid #ff2b5c;
+}
+
+.info {
+  flex: 1;
+}
+
+.genre {
+  margin-top: 10px;
+  color: #ff2b5c;
+}
+
+/* BUTTON */
+.read-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #ff2b5c;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+/* CHAPTER LIST */
+.chapter-list {
+  margin-top: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.chapter {
+  padding: 10px;
+  background: rgba(255, 0, 60, 0.1);
+  border: 1px solid rgba(255, 0, 60, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.chapter:hover {
+  background: rgba(255, 0, 60, 0.25);
+}
+
+.hidden {
+  display: none;
+}
