@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Novel Details | Rumion Novel Hub</title>
+
+  <link rel="stylesheet" href="assets/css/novel.css"/>
+</head>
+
+<body class="novel-page">
+
+  <!-- TOP NAV -->
+  <header class="nav">
+    <a href="home.html" class="logo">⬅ Back</a>
+    <div class="brand">Rumion Novel Hub</div>
+  </header>
+
+  <!-- NOVEL CONTAINER -->
+  <main class="novel-container">
+
+    <!-- LOADING STATE -->
+    <div id="loading" class="loading">
+      Loading novel...
+    </div>
+
+    <!-- NOVEL HEADER -->
+    <section id="novel-header" class="hidden">
+
+      <img id="cover" class="cover" />
+
+      <div class="info">
+        <h1 id="title"></h1>
+
+        <p id="description"></p>
+
+        <div id="genre" class="genre"></div>
+
+        <button id="readBtn" class="read-btn">
+          📖 Start Reading
+        </button>
+      </div>
+
+    </section>
+
+    <!-- CHAPTER LIST -->
+    <section id="chapters-section" class="hidden">
+
+      <h2>Chapters</h2>
+
+      <div id="chapters" class="chapter-list"></div>
+
+    </section>
+
+  </main>
+
+  <script src="assets/js/novel.js"></script>
+</body>
+</html>
