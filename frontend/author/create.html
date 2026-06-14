@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Novel | Rumion Author Studio</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #2b0000, #000000);
+      color: white;
+    }
+
+    .topbar {
+      padding: 18px 25px;
+      background: rgba(255, 0, 60, 0.08);
+      border-bottom: 1px solid rgba(255, 0, 60, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      color: #ff2d55;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .back {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #ff2d55;
+      margin-bottom: 5px;
+    }
+
+    p {
+      opacity: 0.7;
+      margin-bottom: 25px;
+    }
+
+    .form {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255, 0, 60, 0.2);
+      padding: 25px;
+      border-radius: 12px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 0, 60, 0.3);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: #ff2d55;
+      color: white;
+      font-size: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #ff004c;
+    }
+
+    .preview {
+      margin-top: 15px;
+      max-width: 120px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .love {
+      color: #ff2d55;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="logo">📚 Create Novel</div>
+    <a class="back" href="dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <div class="container">
+
+    <h1>Publish Your Story</h1>
+    <p>Upload your novel details and let the world read your imagination.</p>
+
+    <div class="form">
+
+      <label>Novel Title</label>
+      <input type="text" id="title" placeholder="Enter novel title"/>
+
+      <label>Description</label>
+      <textarea id="description" placeholder="Write a short summary of your novel..."></textarea>
+
+      <label>Genres (comma separated)</label>
+      <input type="text" id="genre" placeholder="Romance, Action, Fantasy"/>
+
+      <label>Cover Image</label>
+      <input type="file" id="cover" accept="image/*" onchange="previewImage(event)"/>
+
+      <img id="preview" class="preview"/>
+
+      <button class="btn" onclick="createNovel()">🚀 Upload Novel</button>
+
+    </div>
+
+    <div class="footer">
+      Made with <span class="love">❤️</span> by Smiley Cymor for Ruth my love
+    </div>
+
+  </div>
+
+  <script>
+    function previewImage(event) {
+      const file = event.target.files[0];
+      const img = document.getElementById("preview");
+
+      if (file) {
+        img.src = URL.createObjectURL(file);
+        img.style.display = "block";
+      }
+    }
+
+    async function createNovel() {
+      const token = localStorage.getItem("supabase.auth.token");
+
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+      const genre = document.getElementById("genre").value;
+      const cover = document.getElementById("cover").files[0];
+
+      if (!title) {
+        alert("Title is required");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("genre", genre);
+      if (cover) formData.append("cover", cover);
+
+      try {
+        const res = await fetch("/api/user-novels/upload", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("Novel uploaded successfully ❤️");
+          window.location.href = "my-novels.html";
+        } else {
+          alert(data.message || "Upload failed");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error");
+      }
+    }
+  </script>
+
+</body>
+</html>
