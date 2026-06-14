@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Novels | Rumion Author Studio</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #2b0000, #000000);
+      color: white;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 25px;
+      background: rgba(255, 0, 60, 0.08);
+      border-bottom: 1px solid rgba(255, 0, 60, 0.3);
+    }
+
+    .logo {
+      color: #ff2d55;
+      font-weight: bold;
+    }
+
+    .btn-small {
+      background: #ff2d55;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px;
+    }
+
+    h1 {
+      color: #ff2d55;
+      margin-bottom: 5px;
+    }
+
+    p {
+      opacity: 0.7;
+      margin-bottom: 25px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255, 0, 60, 0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #ff2d55;
+    }
+
+    .cover {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #111;
+    }
+
+    .content {
+      padding: 15px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #ff2d55;
+      margin-bottom: 5px;
+    }
+
+    .desc {
+      font-size: 13px;
+      opacity: 0.7;
+      height: 40px;
+      overflow: hidden;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      gap: 8px;
+    }
+
+    .actions button {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .edit {
+      background: #ffb703;
+      color: black;
+    }
+
+    .delete {
+      background: #ff004c;
+      color: white;
+    }
+
+    .open {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    .publish {
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,0,60,0.3);
+      background: transparent;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      margin-top: 60px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="logo">📖 My Novels</div>
+    <button class="btn-small" onclick="location.href='create.html'">+ New Novel</button>
+  </div>
+
+  <div class="container">
+
+    <h1>Your Stories</h1>
+    <p>Manage, edit, and publish your creative works</p>
+
+    <div id="novelGrid" class="grid"></div>
+
+    <div id="empty" class="empty" style="display:none;">
+      No novels yet. Start writing your first story ✍️
+    </div>
+
+  </div>
+
+  <script>
+    const token = localStorage.getItem("supabase.auth.token");
+
+    async function loadNovels() {
+      try {
+        const res = await fetch("/api/user-novels/my-novels", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+
+        const grid = document.getElementById("novelGrid");
+        const empty = document.getElementById("empty");
+
+        grid.innerHTML = "";
+
+        if (!data.success || data.data.length === 0) {
+          empty.style.display = "block";
+          return;
+        }
+
+        empty.style.display = "none";
+
+        data.data.forEach(novel => {
+          const card = document.createElement("div");
+          card.className = "card";
+
+          card.innerHTML = `
+            <img class="cover" src="${novel.cover_url || 'https://via.placeholder.com/300x180'}" />
+            
+            <div class="content">
+              <div class="title">${novel.title}</div>
+              <div class="desc">${novel.description || 'No description'}</div>
+
+              <button class="publish" onclick="togglePublish('${novel.id}', ${novel.is_published})">
+                ${novel.is_published ? "Unpublish" : "Publish"}
+              </button>
+
+              <div class="actions">
+                <button class="open" onclick="openNovel('${novel.id}')">Open</button>
+                <button class="edit" onclick="editNovel('${novel.id}')">Edit</button>
+                <button class="delete" onclick="deleteNovel('${novel.id}')">Delete</button>
+              </div>
+            </div>
+          `;
+
+          grid.appendChild(card);
+        });
+
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    function openNovel(id) {
+      window.location.href = `../novel.html?id=${id}`;
+    }
+
+    function editNovel(id) {
+      window.location.href = `edit.html?id=${id}`;
+    }
+
+    async function deleteNovel(id) {
+      if (!confirm("Delete this novel?")) return;
+
+      await fetch(`/api/user-novels/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      loadNovels();
+    }
+
+    async function togglePublish(id, current) {
+      await fetch(`/api/user-novels/${id}/publish`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          publish: !current
+        })
+      });
+
+      loadNovels();
+    }
+
+    loadNovels();
+  </script>
+
+</body>
+</html>
