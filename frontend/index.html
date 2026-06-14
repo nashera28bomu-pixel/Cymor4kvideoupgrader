@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rumion Novel Hub</title>
+
+  <link rel="stylesheet" href="assets/css/landing.css">
+
+  <!-- Optional: Google Font for cinematic feel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Glow background -->
+  <div class="glow"></div>
+  <div class="dark-overlay"></div>
+
+  <!-- MAIN CONTENT -->
+  <main class="container">
+
+    <h1 class="title">Rumion Novel Hub</h1>
+
+    <p class="subtitle">
+      Where stories breathe, hearts connect, and imagination never fades.
+    </p>
+
+    <div class="buttons">
+      <button class="primary-btn" onclick="enterApp()">Enter Library</button>
+      <button class="secondary-btn" onclick="goAuthor()">Become an Author</button>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>
+      Made with <span class="heart">❤️</span> by Smiley Cymor
+    </p>
+    <p class="dedication">
+      For Ruth — my love, my inspiration, my calm in every storm.
+    </p>
+  </footer>
+
+  <script>
+    function enterApp() {
+      window.location.href = "home.html";
+    }
+
+    function goAuthor() {
+      window.location.href = "author/dashboard.html";
+    }
+  </script>
+
+</body>
+</html>
