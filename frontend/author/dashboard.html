@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Author Dashboard | Rumion Novel Hub</title>
+
+  <link rel="stylesheet" href="dashboard.css"/>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #2b0000, #000000);
+      color: #fff;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 25px;
+      background: rgba(255, 0, 60, 0.08);
+      border-bottom: 1px solid rgba(255, 0, 60, 0.3);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ff2d55;
+      letter-spacing: 1px;
+    }
+
+    .logout-btn {
+      background: #ff2d55;
+      border: none;
+      padding: 8px 14px;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #ff004c;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .welcome {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .sub {
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 0, 60, 0.2);
+      padding: 20px;
+      border-radius: 12px;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #ff2d55;
+      box-shadow: 0 0 20px rgba(255, 0, 60, 0.2);
+    }
+
+    .card h3 {
+      margin: 0 0 10px 0;
+      color: #ff2d55;
+    }
+
+    .stats {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .stat-box {
+      background: rgba(255, 0, 60, 0.05);
+      border: 1px solid rgba(255, 0, 60, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .stat-box h2 {
+      margin: 0;
+      color: #ff2d55;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .love {
+      color: #ff2d55;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="logo">📚 Rumion Author Studio</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="container">
+    <div class="welcome">Welcome back, Author ✍️</div>
+    <div class="sub">Manage your novels, chapters, and publishing flow</div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <h2 id="novelCount">0</h2>
+        <p>My Novels</p>
+      </div>
+
+      <div class="stat-box">
+        <h2 id="chapterCount">0</h2>
+        <p>Total Chapters</p>
+      </div>
+
+      <div class="stat-box">
+        <h2 id="views">0</h2>
+        <p>Total Views</p>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top: 30px;">
+      <div class="card" onclick="location.href='create.html'">
+        <h3>➕ Create Novel</h3>
+        <p>Start a new story and upload your masterpiece</p>
+      </div>
+
+      <div class="card" onclick="location.href='my-novels.html'">
+        <h3>📖 My Novels</h3>
+        <p>View and manage all your uploaded novels</p>
+      </div>
+
+      <div class="card" onclick="location.href='upload-chapter.html'">
+        <h3>📤 Upload Chapter</h3>
+        <p>Add new chapters to existing novels</p>
+      </div>
+
+      <div class="card" onclick="location.href='edit.html'">
+        <h3>✏️ Edit Works</h3>
+        <p>Update your novels and fix content</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      Made with <span class="love">❤️</span> by Smiley Cymor for Ruth my love
+    </div>
+  </div>
+
+  <script>
+    async function logout() {
+      localStorage.removeItem("supabase.auth.token");
+      alert("Logged out successfully");
+      window.location.href = "../login.html";
+    }
+
+    async function loadStats() {
+      try {
+        const token = localStorage.getItem("supabase.auth.token");
+
+        const res = await fetch("/api/user-novels/my-novels", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById("novelCount").innerText = data.data.length;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    loadStats();
+  </script>
+
+</body>
+</html>
