@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reader | Rumion Novel Hub</title>
+
+  <link rel="stylesheet" href="assets/css/reader.css"/>
+</head>
+
+<body class="reader-body">
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <a href="javascript:history.back()" class="back-btn">⬅ Back</a>
+    <div class="brand">Rumion Novel Hub</div>
+  </header>
+
+  <!-- READER CONTAINER -->
+  <main class="reader-container">
+
+    <!-- LOADING -->
+    <div id="loading" class="loading">
+      Loading chapter...
+    </div>
+
+    <!-- CHAPTER CONTENT -->
+    <article id="chapter-box" class="hidden">
+
+      <h1 id="chapter-title"></h1>
+
+      <div id="chapter-content" class="content"></div>
+
+    </article>
+
+    <!-- NAVIGATION -->
+    <div id="nav" class="hidden nav-controls">
+      <button id="prevBtn">⬅ Previous</button>
+      <button id="nextBtn">Next ➡</button>
+    </div>
+
+  </main>
+
+  <script src="assets/js/reader.js"></script>
+</body>
+</html>
