@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Chapter | Rumion Author Studio</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #2b0000, #000000);
+      color: white;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      padding: 18px 25px;
+      border-bottom: 1px solid rgba(255, 0, 60, 0.3);
+      background: rgba(255, 0, 60, 0.08);
+    }
+
+    .logo {
+      color: #ff2d55;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #ff2d55;
+      margin-bottom: 5px;
+    }
+
+    p {
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+
+    .form {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255, 0, 60, 0.2);
+      padding: 25px;
+      border-radius: 12px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 0, 60, 0.3);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 250px;
+      resize: vertical;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: #ff2d55;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #ff004c;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row > div {
+      flex: 1;
+    }
+
+    .back {
+      color: white;
+      text-decoration: none;
+      opacity: 0.8;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="logo">📤 Upload Chapter</div>
+    <a class="back" href="dashboard.html">← Dashboard</a>
+  </div>
+
+  <div class="container">
+
+    <h1>Write New Chapter</h1>
+    <p>Add new content to your existing novel</p>
+
+    <div class="form">
+
+      <label>Select Novel</label>
+      <select id="novelSelect">
+        <option value="">Loading novels...</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label>Chapter Number</label>
+          <input type="number" id="chapterNumber" placeholder="e.g. 1"/>
+        </div>
+
+        <div>
+          <label>Chapter Title</label>
+          <input type="text" id="chapterTitle" placeholder="Chapter title"/>
+        </div>
+      </div>
+
+      <label>Chapter Content</label>
+      <textarea id="content" placeholder="Write your chapter here..."></textarea>
+
+      <button class="btn" onclick="uploadChapter()">🚀 Publish Chapter</button>
+
+    </div>
+
+  </div>
+
+  <script>
+    const token = localStorage.getItem("supabase.auth.token");
+
+    async function loadNovels() {
+      const select = document.getElementById("novelSelect");
+
+      try {
+        const res = await fetch("/api/user-novels/my-novels", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+
+        select.innerHTML = `<option value="">Select novel</option>`;
+
+        if (data.success) {
+          data.data.forEach(novel => {
+            const opt = document.createElement("option");
+            opt.value = novel.id;
+            opt.textContent = novel.title;
+            select.appendChild(opt);
+          });
+        }
+
+      } catch (err) {
+        select.innerHTML = `<option>Error loading novels</option>`;
+      }
+    }
+
+    async function uploadChapter() {
+      const novel_id = document.getElementById("novelSelect").value;
+      const title = document.getElementById("chapterTitle").value;
+      const content = document.getElementById("content").value;
+      const chapter_number = document.getElementById("chapterNumber").value;
+
+      if (!novel_id || !content) {
+        alert("Novel and content are required");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/user-novels/chapter", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            novel_id,
+            title,
+            content,
+            chapter_number
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("Chapter published ❤️");
+          document.getElementById("content").value = "";
+          document.getElementById("chapterTitle").value = "";
+        } else {
+          alert(data.message || "Upload failed");
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Server error");
+      }
+    }
+
+    loadNovels();
+  </script>
+
+</body>
+</html>
