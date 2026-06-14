@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Author Login | Rumion Novel Hub</title>
+
+  <link rel="stylesheet" href="../assets/css/author.css"/>
+</head>
+
+<body class="auth-body">
+
+  <div class="auth-container">
+
+    <div class="auth-card">
+
+      <h1 class="logo">Rumion Authors</h1>
+      <p class="subtitle">Write stories that fall in love ❤️</p>
+
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+
+      <button id="loginBtn">Login</button>
+
+      <p class="switch">
+        Don't have an account?
+        <a href="signup.html">Create one</a>
+      </p>
+
+      <p id="msg" class="msg"></p>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    /* -----------------------------
+       SUPABASE INIT
+    ------------------------------*/
+    const supabaseUrl = "YOUR_SUPABASE_URL";
+    const supabaseKey = "YOUR_SUPABASE_ANON_KEY";
+
+    const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+    /* -----------------------------
+       LOGIN HANDLER
+    ------------------------------*/
+    const loginBtn = document.getElementById("loginBtn");
+    const msg = document.getElementById("msg");
+
+    loginBtn.onclick = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      msg.textContent = "Logging in...";
+
+      const { data, error } = await client.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        msg.textContent = error.message;
+        return;
+      }
+
+      // Save session
+      localStorage.setItem("sb_token", data.session.access_token);
+      localStorage.setItem("sb_user", JSON.stringify(data.user));
+
+      msg.textContent = "Login successful ❤️ Redirecting...";
+
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 1200);
+    };
+  </script>
+
+</body>
+</html>
