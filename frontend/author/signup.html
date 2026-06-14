@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Author Signup | Rumion Novel Hub</title>
+
+  <link rel="stylesheet" href="../assets/css/author.css"/>
+</head>
+
+<body class="auth-body">
+
+  <div class="auth-container">
+
+    <div class="auth-card">
+
+      <h1 class="logo">Join Rumion</h1>
+      <p class="subtitle">Become an author of emotions ❤️</p>
+
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+
+      <button id="signupBtn">Create Account</button>
+
+      <p class="switch">
+        Already have an account?
+        <a href="login.html">Login</a>
+      </p>
+
+      <p id="msg" class="msg"></p>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    /* -----------------------------
+       SUPABASE INIT
+    ------------------------------*/
+    const supabaseUrl = "YOUR_SUPABASE_URL";
+    const supabaseKey = "YOUR_SUPABASE_ANON_KEY";
+
+    const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+    /* -----------------------------
+       SIGNUP HANDLER
+    ------------------------------*/
+    const signupBtn = document.getElementById("signupBtn");
+    const msg = document.getElementById("msg");
+
+    signupBtn.onclick = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        msg.textContent = "Please fill all fields 💔";
+        return;
+      }
+
+      msg.textContent = "Creating account...";
+
+      const { data, error } = await client.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        msg.textContent = error.message;
+        return;
+      }
+
+      // Auto-login if session exists
+      if (data.session) {
+        localStorage.setItem("sb_token", data.session.access_token);
+        localStorage.setItem("sb_user", JSON.stringify(data.user));
+
+        msg.textContent = "Account created ❤️ Redirecting...";
+
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1200);
+      } else {
+        msg.textContent = "Check your email to confirm account ❤️";
+      }
+    };
+  </script>
+
+</body>
+</html>
