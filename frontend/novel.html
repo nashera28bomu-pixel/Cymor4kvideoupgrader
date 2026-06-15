@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rumion Novel Hub — Novel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo"><span class="heart">♥</span> Rumion</a>
+      <div class="nav-search">
+        <input type="search" id="nav-search-input" placeholder="Search novels…">
+      </div>
+      <div class="nav-links">
+        <a href="home.html">Browse</a>
+        <span data-auth-slot></span>
+      </div>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <main class="container page-body">
+    <div id="novel-detail">
+      <!-- populated by novel.js -->
+    </div>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Chapters</h2>
+      </div>
+      <div id="chapter-list" class="chapter-list">
+        <!-- populated by novel.js -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Made with <span class="heart">♥</span> on Rumion Novel Hub
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/novel.js"></script>
+</body>
+</html>
