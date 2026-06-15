@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rumion Novel Hub — Stories worth falling for</title>
+  <meta name="description" content="Rumion Novel Hub — read web novels from around the world, or publish your own, chapter by chapter, free forever.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Loading transition -->
+  <div class="page-loader" id="page-loader">
+    <div class="loader-heart">♥</div>
+    <div class="loader-text">Rumion Novel Hub loading…</div>
+  </div>
+
+  <!-- Falling petals -->
+  <div class="petals" id="petals" aria-hidden="true"></div>
+
+  <!-- Nav -->
+  <div class="lnd-nav">
+    <a href="index.html" class="logo"><span class="heart">♥</span> Rumion</a>
+    <a href="home.html" class="btn btn-ghost btn-sm" data-transition>Browse novels</a>
+  </div>
+
+  <!-- Hero -->
+  <header class="lnd-hero">
+    <div class="eyebrow">Rumion Novel Hub</div>
+    <h1>Stories worth falling for <span class="heart">♥</span></h1>
+    <p>Read web novels from across the world, or publish your own — chapter by chapter, free, forever.</p>
+    <div class="lnd-actions">
+      <a href="home.html" class="btn btn-primary" data-transition>Start reading</a>
+      <a href="author/dashboard.html" class="btn btn-ghost" data-transition>Become an author</a>
+    </div>
+  </header>
+
+  <!-- Features -->
+  <section class="lnd-section">
+    <div class="lnd-section-head">
+      <div class="eyebrow">What you get</div>
+      <h2>Built for readers and writers alike</h2>
+      <p>Every tool you need to fall into a story — or tell one of your own.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="icon">📖</span>
+        <h3>A growing library</h3>
+        <p>Browse trending stories from across the web alongside original novels published right here on Rumion.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">✍️</span>
+        <h3>Publish in minutes</h3>
+        <p>Create an account, add a cover and description, and start posting chapters — no technical setup required.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">📱</span>
+        <h3>Reads beautifully anywhere</h3>
+        <p>A clean, distraction-free reader designed for long chapters, late nights, and small screens.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">♥</span>
+        <h3>Free, forever</h3>
+        <p>No paywalls for readers, no fees for authors. Rumion exists to connect stories with the people who love them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Rumion -->
+  <section class="lnd-section">
+    <div class="lnd-section-head">
+      <div class="eyebrow">Why Rumion</div>
+      <h2>A home for stories that deserve to be read</h2>
+    </div>
+
+    <div class="why-row">
+      <div>
+        <div class="why-num">For readers</div>
+        <h3>Discover your next obsession</h3>
+        <p>From rising indie authors to popular ongoing series, Rumion brings web novels into one place — organized, easy to browse, and easy to read on any device.</p>
+      </div>
+      <div class="why-visual">📚</div>
+    </div>
+
+    <div class="why-row">
+      <div class="why-visual">✍️</div>
+      <div>
+        <div class="why-num">For authors</div>
+        <h3>Your story, your shelf</h3>
+        <p>Publish chapters as you write them. Edit, reorder, and manage your novels from a simple dashboard built for writers — not developers.</p>
+      </div>
+    </div>
+
+    <div class="why-row">
+      <div>
+        <div class="why-num">For everyone</div>
+        <h3>A community, not just a catalog</h3>
+        <p>Rumion is built to grow with the people who use it — readers who leave a story better than they found it, and authors who keep showing up, chapter after chapter.</p>
+      </div>
+      <div class="why-visual">♥</div>
+    </div>
+  </section>
+
+  <!-- Upcoming authors -->
+  <section class="lnd-section">
+    <div class="lnd-section-head">
+      <div class="eyebrow">Rising voices</div>
+      <h2>Upcoming authors on Rumion</h2>
+      <p>New writers are joining every week. Here's a glimpse of who's publishing next.</p>
+    </div>
+    <div class="authors-grid" id="authors-grid">
+      <!-- populated by landing.js, falls back to placeholders -->
+      <div class="author-card">
+        <div class="author-avatar">S</div>
+        <h3>Simion Nashera</h3>
+        <p>Drama &amp; Reality fiction</p>
+      </div>
+      <div class="author-card">
+        <div class="author-avatar">?</div>
+        <h3>Your name here</h3>
+        <p>Publish your first novel</p>
+      </div>
+      <div class="author-card">
+        <div class="author-avatar">?</div>
+        <h3>Your name here</h3>
+        <p>Publish your first novel</p>
+      </div>
+      <div class="author-card">
+        <div class="author-avatar">?</div>
+        <h3>Your name here</h3>
+        <p>Publish your first novel</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About creator -->
+  <section class="lnd-section">
+    <div class="lnd-section-head">
+      <div class="eyebrow">About the creator</div>
+      <h2>Made with love, for readers and writers</h2>
+    </div>
+    <div class="creator-card">
+      <div class="creator-avatar">LC</div>
+      <div>
+        <div class="role">Founder &amp; Developer</div>
+        <h3>Legendary Smiley Cymor</h3>
+        <p>Rumion Novel Hub was built by Legendary Smiley Cymor — developer, storyteller, and the author behind <em>Life in My Own World</em> — as a space where stories could be shared freely. It's made for the people who write late into the night, the readers who fall in love with a chapter and need the next one immediately, and everyone in between. This is a love letter to fiction, built one feature at a time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="lnd-cta">
+    <h2>Ready to fall into a story?</h2>
+    <p>Start reading for free, or share your own world with Rumion.</p>
+    <div class="lnd-actions">
+      <a href="home.html" class="btn btn-primary" data-transition>Start reading</a>
+      <a href="signup.html" class="btn btn-ghost" data-transition>Create an account</a>
+    </div>
+  </section>
+
+  <footer class="footer" style="position:relative;z-index:1;">
+    Made with <span class="heart">♥</span> on Rumion Novel Hub
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/landing.js"></script>
+</body>
+</html>
