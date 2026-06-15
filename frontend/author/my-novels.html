@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Novels — Rumion Novel Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="logo"><span class="heart">♥</span> Rumion</a>
+      <div class="nav-links">
+        <a href="../home.html">Browse</a>
+        <a href="dashboard.html">Dashboard</a>
+        <span data-auth-slot></span>
+      </div>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <main class="container page-body">
+    <div class="dash-header">
+      <h1>My Novels</h1>
+      <a href="create.html" class="btn btn-primary">+ New novel</a>
+    </div>
+
+    <div id="novels-list">
+      <div class="state-msg"><div class="spinner"></div><p>Loading…</p></div>
+    </div>
+  </main>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/author.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!AUTH.requireAuth()) return;
+      load();
+    });
+
+    async function load() {
+      const el = document.getElementById("novels-list");
+      try {
+        const res = await api.userNovels.myNovels();
+        const novels = res.data || [];
+
+        if (!novels.length) {
+          el.innerHTML = emptyState(
+            "No novels yet",
+            "Publish your first novel to start building your shelf."
+          );
+          return;
+        }
+
+        el.innerHTML = novels.map(authorNovelRowHtml).join("");
+        attachRowActions(el, load);
+      } catch (err) {
+        el.innerHTML = errorState(err.message);
+      }
+    }
+  </script>
+</body>
+</html>

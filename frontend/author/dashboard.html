@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Author Dashboard — Rumion Novel Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="logo"><span class="heart">♥</span> Rumion</a>
+      <div class="nav-links">
+        <a href="../home.html">Browse</a>
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <span data-auth-slot></span>
+      </div>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <main class="container page-body">
+    <div class="dash-header">
+      <h1>Welcome back<span id="username-suffix"></span></h1>
+    </div>
+
+    <div class="dash-grid">
+      <a class="dash-card" href="create.html">
+        <span class="icon">📖</span>
+        <h3>Publish a new novel</h3>
+        <p>Add a title, cover, and description to start a new story.</p>
+      </a>
+      <a class="dash-card" href="upload-chapter.html">
+        <span class="icon">✍️</span>
+        <h3>Add a chapter</h3>
+        <p>Write and publish the next chapter to one of your novels.</p>
+      </a>
+      <a class="dash-card" href="my-novels.html">
+        <span class="icon">📚</span>
+        <h3>My novels</h3>
+        <p>View, edit, and manage everything you've published.</p>
+      </a>
+    </div>
+
+    <div class="section-head">
+      <h2>Your latest novels</h2>
+      <a href="my-novels.html">View all →</a>
+    </div>
+    <div id="latest-novels">
+      <div class="state-msg"><div class="spinner"></div><p>Loading…</p></div>
+    </div>
+  </main>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/author.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!AUTH.requireAuth()) return;
+
+      const user = AUTH.getUser();
+      if (user) {
+        document.getElementById("username-suffix").textContent =
+          `, ${user.username || user.email}`;
+      }
+
+      loadLatestNovels();
+    });
+
+    async function loadLatestNovels() {
+      const el = document.getElementById("latest-novels");
+      try {
+        const res = await api.userNovels.myNovels();
+        const novels = (res.data || []).slice(0, 3);
+
+        if (!novels.length) {
+          el.innerHTML = emptyState(
+            "No novels yet",
+            "Publish your first novel to see it here."
+          );
+          return;
+        }
+
+        el.innerHTML = novels.map(authorNovelRowHtml).join("");
+        attachRowActions(el);
+      } catch (err) {
+        el.innerHTML = errorState(err.message);
+      }
+    }
+  </script>
+</body>
+</html>

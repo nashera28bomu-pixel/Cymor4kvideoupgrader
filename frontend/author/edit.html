@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Novel — Rumion Novel Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="logo"><span class="heart">♥</span> Rumion</a>
+      <div class="nav-links">
+        <a href="../home.html">Browse</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="my-novels.html">My Novels</a>
+        <span data-auth-slot></span>
+      </div>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <main class="container page-body" style="max-width: 720px;">
+    <div class="dash-header">
+      <h1 id="page-title">Edit Novel</h1>
+      <a href="my-novels.html" class="btn btn-ghost">← Back to My Novels</a>
+    </div>
+
+    <div id="loading-state"><div class="state-msg"><div class="spinner"></div><p>Loading…</p></div></div>
+
+    <div id="edit-area" style="display:none;">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="details">Details</button>
+        <button class="tab-btn" data-tab="chapters">Chapters</button>
+      </div>
+
+      <!-- DETAILS TAB -->
+      <div class="tab-panel active" id="tab-details">
+        <div id="form-alert"></div>
+        <form id="edit-form">
+          <div class="field">
+            <label for="title">Title *</label>
+            <input type="text" id="title" required>
+          </div>
+          <div class="field">
+            <label for="description">Description</label>
+            <textarea id="description" rows="4"></textarea>
+          </div>
+          <div class="field">
+            <label for="genre">Genres</label>
+            <input type="text" id="genre" placeholder="Romance, Fantasy, Drama (comma separated)">
+          </div>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Save changes</button>
+        </form>
+
+        <hr style="border-color: var(--line); margin: 32px 0;">
+
+        <div id="publish-area"></div>
+      </div>
+
+      <!-- CHAPTERS TAB -->
+      <div class="tab-panel" id="tab-chapters">
+        <div class="section-head">
+          <h2 style="font-size:1.2rem;">Chapters</h2>
+          <a id="add-chapter-link" href="upload-chapter.html">+ Add chapter</a>
+        </div>
+        <div id="chapters-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/author.js"></script>
+  <script>
+    let currentNovel = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!AUTH.requireAuth()) return;
+
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      if (!id) {
+        document.getElementById("loading-state").innerHTML = errorState("No novel was specified.");
+        return;
+      }
+
+      document.getElementById("add-chapter-link").href = `upload-chapter.html?novel=${encodeURIComponent(id)}`;
+
+      // Tab switching
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+          document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+        });
+      });
+
+      load(id);
+    });
+
+    async function load(id) {
+      try {
+        const res = await api.userNovels.get(id);
+        const { novel, chapters } = res.data;
+        currentNovel = novel;
+
+        document.getElementById("page-title").textContent = `Edit "${novel.title}"`;
+        document.getElementById("title").value = novel.title || "";
+        document.getElementById("description").value = novel.description || "";
+        document.getElementById("genre").value = Array.isArray(novel.genre) ? novel.genre.join(", ") : "";
+
+        renderPublishArea(novel);
+        renderChapters(chapters || []);
+
+        document.getElementById("loading-state").style.display = "none";
+        document.getElementById("edit-area").style.display = "block";
+      } catch (err) {
+        document.getElementById("loading-state").innerHTML = errorState(err.message);
+      }
+    }
+
+    function renderPublishArea(novel) {
+      const el = document.getElementById("publish-area");
+      const statusClass = novel.is_published ? "published" : "draft";
+      const statusLabel = novel.is_published ? "Published" : "Draft";
+
+      el.innerHTML = `
+        <p style="margin-bottom:12px;">
+          Status: <span class="status-pill ${statusClass}">${statusLabel}</span>
+        </p>
+        <div class="row-actions">
+          <button class="btn ${novel.is_published ? "btn-ghost" : "btn-primary"}" id="toggle-publish-btn">
+            ${novel.is_published ? "Unpublish" : "Publish"} novel
+          </button>
+          <button class="btn btn-danger" id="delete-novel-btn">Delete novel</button>
+        </div>
+      `;
+
+      document.getElementById("toggle-publish-btn").addEventListener("click", async (e) => {
+        const btn = e.target;
+        const publish = !novel.is_published;
+        btn.disabled = true;
+        try {
+          await api.userNovels.setPublish(novel.id, publish);
+          novel.is_published = publish;
+          showToast(publish ? "Novel published" : "Novel unpublished");
+          renderPublishArea(novel);
+        } catch (err) {
+          showToast(err.message);
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById("delete-novel-btn").addEventListener("click", async () => {
+        if (!confirm("Delete this novel and all its chapters? This cannot be undone.")) return;
+        try {
+          await api.userNovels.remove(novel.id);
+          showToast("Novel deleted");
+          setTimeout(() => (window.location.href = "my-novels.html"), 500);
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    }
+
+    function renderChapters(chapters) {
+      const el = document.getElementById("chapters-list");
+      if (!chapters.length) {
+        el.innerHTML = emptyState("No chapters yet", "Add your first chapter to this novel.");
+        return;
+      }
+
+      const sorted = [...chapters].sort((a, b) => (a.chapter_number ?? 0) - (b.chapter_number ?? 0));
+
+      el.innerHTML = `<div class="chapter-list">` + sorted.map((ch) => {
+        const num = ch.chapter_number != null ? `Ch. ${ch.chapter_number}` : "";
+        const date = ch.created_at ? new Date(ch.created_at).toLocaleDateString() : "";
+        return `
+          <div class="chapter-row">
+            <span class="ch-name">${num ? num + " — " : ""}${escapeHtml(ch.title || "Untitled")}</span>
+            <span class="ch-meta">${escapeHtml(date)}</span>
+          </div>
+        `;
+      }).join("") + `</div>`;
+    }
+
+    document.getElementById("edit-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const alertEl = document.getElementById("form-alert");
+      const btn = document.getElementById("submit-btn");
+
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const genre = document.getElementById("genre").value.trim();
+
+      alertEl.innerHTML = "";
+
+      if (!title) {
+        alertEl.innerHTML = `<div class="alert alert-error">Title is required.</div>`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+
+      try {
+        await api.userNovels.update(currentNovel.id, { title, description, genre });
+        alertEl.innerHTML = `<div class="alert alert-success">Changes saved.</div>`;
+        showToast("Saved");
+      } catch (err) {
+        alertEl.innerHTML = `<div class="alert alert-error">${escapeHtml(err.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Save changes";
+      }
+    });
+  </script>
+</body>
+</html>

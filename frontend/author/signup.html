@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign up — Rumion Novel Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo"><span class="heart">♥</span> Rumion</a>
+      <div class="nav-links">
+        <a href="home.html">Browse</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page-body">
+    <div class="form-card">
+      <h1>Join Rumion</h1>
+      <p class="sub">Create an account to start publishing your stories.</p>
+
+      <div id="form-alert"></div>
+
+      <form id="signup-form">
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="penname (optional)">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" required minlength="6" placeholder="At least 6 characters">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Create account</button>
+      </form>
+
+      <div class="switch">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const alertEl = document.getElementById("form-alert");
+      const btn = document.getElementById("submit-btn");
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      alertEl.innerHTML = "";
+      btn.disabled = true;
+      btn.textContent = "Creating account…";
+
+      try {
+        await api.auth.register(email, password, username);
+        alertEl.innerHTML = `<div class="alert alert-success">Account created! You can now log in.</div>`;
+        showToast("Account created — please log in");
+        setTimeout(() => (window.location.href = "login.html"), 1200);
+      } catch (err) {
+        alertEl.innerHTML = `<div class="alert alert-error">${escapeHtml(err.message)}</div>`;
+        btn.disabled = false;
+        btn.textContent = "Create account";
+      }
+    });
+  </script>
+</body>
+</html>
