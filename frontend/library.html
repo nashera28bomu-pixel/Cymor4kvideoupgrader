@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Library — Rumion Novel Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .library-row {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: var(--ink-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 10px;
+      transition: border-color .2s;
+    }
+    .library-row:hover { border-color: var(--crimson); }
+    .lib-cover {
+      width: 54px;
+      height: 80px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--ink-soft);
+    }
+    .lib-cover-placeholder {
+      width: 54px;
+      height: 80px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--ink-soft), var(--crimson));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .75rem;
+      color: var(--rose);
+      text-align: center;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .lib-info { flex: 1; min-width: 0; }
+    .lib-info h3 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lib-info .ch { font-size: .8rem; color: var(--rose); margin-bottom: 6px; }
+    .lib-info .date { font-size: .75rem; color: rgba(245,230,216,.35); }
+    .lib-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo"><span class="heart">♥</span> Rumion</a>
+      <div class="nav-links">
+        <a href="home.html">Browse</a>
+        <span data-auth-slot></span>
+      </div>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <main class="container page-body">
+    <div class="dash-header">
+      <h1 style="font-family:var(--font-display);font-size:2rem;">My Library</h1>
+      <button class="btn btn-danger btn-sm" id="clear-all-btn">Clear all</button>
+    </div>
+
+    <div id="library-list">
+      <div class="state-msg"><div class="spinner"></div><p>Loading…</p></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Made with <span class="heart">♥</span> on Rumion Novel Hub
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      renderLibrary();
+
+      document.getElementById("clear-all-btn").addEventListener("click", () => {
+        if (!confirm("Clear your entire reading history?")) return;
+        localStorage.removeItem("rumion_reading_history");
+        renderLibrary();
+      });
+    });
+
+    function renderLibrary() {
+      const list = document.getElementById("library-list");
+      const history = getReadingHistory();
+
+      if (!history.length) {
+        list.innerHTML = emptyState(
+          "Your library is empty",
+          "Start reading any novel and it will appear here so you can pick up where you left off."
+        );
+        return;
+      }
+
+      list.innerHTML = history.map((entry) => {
+        const coverHtml = entry.cover
+          ? `<img class="lib-cover" src="${escapeHtml(entry.cover)}" alt="${escapeHtml(entry.novelTitle)} cover">`
+          : `<div class="lib-cover-placeholder">${escapeHtml((entry.novelTitle || "?").charAt(0))}</div>`;
+
+        let continueHref, novelHref;
+        if (entry.type === "external") {
+          continueHref = `external-reader.html?novel=${encodeURIComponent(entry.novelId)}&chapter=${encodeURIComponent(entry.chapterId)}${entry.detailPath ? `&path=${encodeURIComponent(entry.detailPath)}` : ""}`;
+          novelHref = `external-novel.html?id=${encodeURIComponent(entry.novelId)}${entry.detailPath ? `&path=${encodeURIComponent(entry.detailPath)}` : ""}`;
+        } else {
+          continueHref = `reader.html?novel=${encodeURIComponent(entry.novelId)}&chapter=${encodeURIComponent(entry.chapterId)}`;
+          novelHref = `novel.html?id=${encodeURIComponent(entry.novelId)}`;
+        }
+
+        const date = entry.updatedAt
+          ? new Date(entry.updatedAt).toLocaleDateString()
+          : "";
+
+        return `
+          <div class="library-row" data-type="${escapeHtml(entry.type)}" data-novel="${escapeHtml(entry.novelId)}">
+            ${coverHtml}
+            <div class="lib-info">
+              <h3>${escapeHtml(entry.novelTitle || "Untitled")}</h3>
+              <div class="ch">Last read: ${escapeHtml(entry.chapterTitle || "")}</div>
+              <div class="date">${escapeHtml(date)}</div>
+            </div>
+            <div class="lib-actions">
+              <a href="${continueHref}" class="btn btn-primary btn-sm">Continue</a>
+              <a href="${novelHref}" class="btn btn-ghost btn-sm">Chapters</a>
+              <button class="btn btn-danger btn-sm" onclick="removeEntry('${escapeHtml(entry.type)}','${escapeHtml(entry.novelId)}')">✕</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function removeEntry(type, novelId) {
+      removeReadingProgress(type, novelId);
+      renderLibrary();
+    }
+  </script>
+</body>
+</html>
