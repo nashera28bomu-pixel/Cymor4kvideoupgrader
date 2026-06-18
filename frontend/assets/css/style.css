@@ -1013,7 +1013,197 @@ label {
   }
 }
 
-/* Cover upload preview */
+/* ------------------------------------------------------------
+   Reader bottom nav bar (floating prev/next)
+   ------------------------------------------------------------ */
+
+.reader-float-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(26, 14, 20, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  gap: 12px;
+}
+
+.reader-float-nav .chapter-label {
+  font-size: 0.8rem;
+  color: var(--rose);
+  text-align: center;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Extra bottom padding so content doesn't hide behind float nav */
+.reader-content {
+  padding-bottom: 100px;
+}
+
+/* ------------------------------------------------------------
+   Ratings widget
+   ------------------------------------------------------------ */
+
+.rating-section {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.rating-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+.stars-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.star-avg {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ember);
+}
+
+.star-count {
+  font-size: 0.85rem;
+  color: var(--rose);
+}
+
+.stars-input {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: rgba(212, 165, 116, 0.3);
+  transition: color 0.15s, transform 0.1s;
+  padding: 0;
+  line-height: 1;
+}
+
+.star-btn.active,
+.star-btn:hover,
+.star-btn.hover {
+  color: var(--ember);
+  transform: scale(1.15);
+}
+
+.rating-msg {
+  font-size: 0.82rem;
+  color: var(--rose);
+  margin-top: 8px;
+}
+
+/* ------------------------------------------------------------
+   Comments section
+   ------------------------------------------------------------ */
+
+.comments-section {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  padding-bottom: 20px;
+}
+
+.comments-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin-bottom: 18px;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.comment-form textarea {
+  min-height: 80px;
+  font-size: 0.95rem;
+  resize: none;
+}
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.comment-card {
+  background: var(--ink-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.comment-card .comment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.comment-card .comment-user {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--crimson-bright);
+}
+
+.comment-card .comment-date {
+  font-size: 0.75rem;
+  color: rgba(245, 230, 216, 0.35);
+}
+
+.comment-card .comment-text {
+  font-size: 0.92rem;
+  color: var(--parchment);
+  line-height: 1.6;
+}
+
+.comment-card .delete-btn {
+  background: none;
+  border: none;
+  color: var(--rose);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.comment-card .delete-btn:hover {
+  opacity: 1;
+  color: var(--crimson-bright);
+}
+
+.views-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: var(--rose);
+  margin-bottom: 6px;
+}
 .cover-upload {
   display: flex;
   gap: 16px;
