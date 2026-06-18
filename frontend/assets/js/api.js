@@ -105,6 +105,30 @@ const api = {
     setPublish: (id, publish) =>
       request(`/api/user-novels/${id}/publish`, { method: "PATCH", body: { publish }, auth: true }),
   },
+
+  /* ---------------- Interactions (comments, ratings, views) ---------------- */
+  interactions: {
+    view: (novel_id, novel_type) =>
+      request("/api/interactions/view", { method: "POST", body: { novel_id, novel_type } }),
+
+    getViews: (novel_id) =>
+      request(`/api/interactions/view/${novel_id}`),
+
+    getRating: (novel_id) =>
+      request(`/api/interactions/rating/${novel_id}`, { auth: true }),
+
+    rate: (novel_id, novel_type, rating) =>
+      request("/api/interactions/rating", { method: "POST", body: { novel_id, novel_type, rating }, auth: true }),
+
+    getComments: (novel_id, chapter_id, page = 1) =>
+      request(`/api/interactions/comments/${novel_id}/${chapter_id}?page=${page}&limit=20`),
+
+    postComment: (novel_id, chapter_id, novel_type, content) =>
+      request("/api/interactions/comments", { method: "POST", body: { novel_id, chapter_id, novel_type, content }, auth: true }),
+
+    deleteComment: (id) =>
+      request(`/api/interactions/comments/${id}`, { method: "DELETE", auth: true }),
+  },
 };
 
 /* ============================================================
