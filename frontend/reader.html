@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rumion Novel Hub — Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <div class="reader-bar">
+    <a href="home.html" class="logo" style="font-size:1.2rem;">♥</a>
+    <div class="title" id="reader-title">Loading…</div>
+    <a id="back-to-novel" href="home.html" class="btn btn-ghost btn-sm">Chapters</a>
+  </div>
+
+  <div class="reader-content" id="reader-content">
+    <div class="state-msg"><div class="spinner"></div><p>Loading chapter…</p></div>
+  </div>
+
+  <!-- Floating prev/next nav -->
+  <div class="reader-float-nav" id="reader-float-nav" style="display:none;">
+    <span id="float-prev"></span>
+    <span class="chapter-label" id="float-label"></span>
+    <span id="float-next"></span>
+  </div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/reader.js"></script>
+</body>
+</html>
